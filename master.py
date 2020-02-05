@@ -171,7 +171,7 @@ if __name__ == '__main__':
 		mejor_configuracion = None
 
 		f = lambda x: fitness(x)
-		run(10, 19, 100, f)
+		run(100, 19, 100, f)
 		print('<<<<<<<<<<<<<<<< MEJOR CONFIGURACIÓN PASO ', numero_paso, " >>>>>>>>>>>>>>>>>>")
 
 		print(mejor_configuracion)

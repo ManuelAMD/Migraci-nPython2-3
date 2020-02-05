@@ -30,7 +30,7 @@ def baseline_model(tam_imagen, dropout, optimizer, activation, convolutional_lay
 	model.add(Dropout(rate=dropout))
 	model.add(Dense(10, activation='softmax'))
 	#============ Multi-GPU ============
-	model = multi_gpu.to_multi_gpu(model,n_gpus=2)
+	model = multi_gpu.to_multi_gpu(model,n_gpus=4)
 	#===================================
 	#Compilar modelo
 	model.compile(loss=keras.losses.categorical_crossentropy,
@@ -43,7 +43,7 @@ def fitModel(datos_imagenes_entrenamiento, datos_target_entrenamiento, tam_image
 	model = baseline_model(tam_imagen, dropout, optimizer, activation, convolutional_layer_1, convolutional_layer_2, pooling_layer_1, pooling_layer_2)
 	#Empieza el entrenamiento con fit.
 	print('Empezo el entrenamiento:')
-	model.fit(datos_imagenes_entrenamiento, datos_target_entrenamiento, batch_size=256, epochs=1, verbose=1)
+	model.fit(datos_imagenes_entrenamiento, datos_target_entrenamiento, batch_size=1000, epochs=epochs, verbose=1)
 	print('Finalizo el entrenamiento')
 	return model
 
