@@ -217,7 +217,7 @@ numero_paso = 1
 print(nombre_archivo)
 
 #Credentials = pika.PlainCredentials('server','nombre')
-connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost',credentials=pika.PlainCredentials('guest','guest')))
+connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost',credentials=pika.PlainCredentials('guest','guest'),heartbeat=65535, blocked_connection_timeout=65535))
 														#heartbeat_interval=65535, blocked_connection_timeout=65535))
 channel = connection.channel()
 channel.basic_qos(prefetch_count=1)

@@ -165,18 +165,16 @@ if __name__ == '__main__':
 	td = ThreadRabbitMq('localhost','guest','guest','individuosEntrenados', recieve_individuos, durable=True)
 	td.start()
 
-	for numero_paso in range(1, 2):
-		mejor_error = 99999999
-		mejor_modelo = None
-		mejor_configuracion = None
-
-		f = lambda x: fitness(x)
-		run(100, 19, 100, f)
-		print('<<<<<<<<<<<<<<<< MEJOR CONFIGURACIÓN PASO ', numero_paso, " >>>>>>>>>>>>>>>>>>")
-
-		print(mejor_configuracion)
-
-		#nombre_iteracion = "paso"+str(numero_paso)
-		#helper.guardarMSEContinuoExcel('Experimento_resultadosMSE'+fecha+'_'+hora+'.csv',nombre_iteracion, mejor_error, 'MSE_TEST', mejor_configuracion, 'MEJOR CONFIGURACIÓN')
+	#for numero_paso in range(1, 2):
+	mejor_error = 99999999
+	mejor_modelo = None
+	mejor_configuracion = None
+	f = lambda x: fitness(x)
+	run(100, 19, 100, f)
+	#print('<<<<<<<<<<<<<<<< MEJOR CONFIGURACIÓN PASO ', numero_paso, " >>>>>>>>>>>>>>>>>>")
+	print('<<<<<<<<<<<<<<<< MEJOR CONFIGURACIÓN >>>>>>>>>>>>>>>>>>')
+	print(mejor_configuracion)
+	#nombre_iteracion = "paso"+str(numero_paso)
+	#helper.guardarMSEContinuoExcel('Experimento_resultadosMSE'+fecha+'_'+hora+'.csv',nombre_iteracion, mejor_error, 'MSE_TEST', mejor_configuracion, 'MEJOR CONFIGURACIÓN')
 
 	print('Inicio: ', fecha, ' ', hora, ' Termino: ', time.strftime('%H:%M:%S'), ' ', time.strftime('%d/%m/%Y'))

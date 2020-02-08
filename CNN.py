@@ -11,10 +11,11 @@ import csv
 import Helper as helper
 
 #============ Multi-GPU ==========
-import multi_gpu
+#import multi_gpu
+from tensorflow.keras.utils import multi_gpu_model
 
-def baseline_model(tam_imagen, dropout, optimizer, activation, convolutional_layer_1, convolutional_layer_2, pooling_layer_1, pooling_layer_2):
-	#Crear el modelo
+def baseline_model(strategy, tam_imagen, dropout, optimizer, activation, convolutional_layer_1, convolutional_layer_2, pooling_layer_1, pooling_layer_2):
+	"""#Crear el modelo
 	model = Sequential()
 	#Primera capa entrada
 	model.add(convolutional_layer_1)
@@ -30,20 +31,49 @@ def baseline_model(tam_imagen, dropout, optimizer, activation, convolutional_lay
 	model.add(Dropout(rate=dropout))
 	model.add(Dense(10, activation='softmax'))
 	#============ Multi-GPU ============
-	model = multi_gpu.to_multi_gpu(model,n_gpus=4)
+	model = multi_gpu_model(model,gpus=2)
 	#===================================
 	#Compilar modelo
 	model.compile(loss=keras.losses.categorical_crossentropy,
     			optimizer=keras.optimizers.Adadelta(),
-    			metrics=['accuracy'])
+    			metrics=['accuracy'])"""
+	with strategy.scope():
+		model = Sequential()
+		model.add(convolutional_layer_1)
+		model.add(pooling_layer_1)
+		model.add(convolutional_layer_2)
+		model.add(pooling_layer_2)
+		model.add(Flatten())
+		model.add(Dense(128, activation='relu'))
+		model.add(Dropout(rate=dropout))
+		model.add(Dense(10, activation='softmax'))
+
+		model.compile(loss=keras.losses.categorical_crossentropy,
+				optimizer=keras.optimizers.Adadelta(),
+				metrics=['accuracy'])
+	#strategy = tf.distribute.MirroredStrategy()
+	#print('number of devices: {}'.format(strategy.num_replicas_in_sync))
 	return model
 
 def fitModel(datos_imagenes_entrenamiento, datos_target_entrenamiento, tam_imagen, epochs, dropout, optimizer, activation, convolutional_layer_1, convolutional_layer_2, pooling_layer_1, pooling_layer_2):
+	#batch_size_per_replica = batch_size / strategy.num_replicas_in_sync
+	#N gpus
+	strategy = tf.distribute.MirroredStrategy()
+	#2 gpus
+	#strategy = tf.distribute.MirroredStrategy(devices=['/gpu:2','/gpu:3'])
+	#1 gpu
+	#strategy = tf.distribute.OneDeviceStrategy(device="/gpu:0")
+	batch_size = 1000 * strategy.num_replicas_in_sync 
+	#batch_size = 1000 
+	buffer_size = 10000
+	train_dataset = tf.data.Dataset.from_tensor_slices((datos_imagenes_entrenamiento,datos_target_entrenamiento))
+	train_dataset = train_dataset.shuffle(buffer_size).repeat().batch(batch_size)
 	#Construyedo el modelo
-	model = baseline_model(tam_imagen, dropout, optimizer, activation, convolutional_layer_1, convolutional_layer_2, pooling_layer_1, pooling_layer_2)
+	model = baseline_model(strategy, tam_imagen, dropout, optimizer, activation, convolutional_layer_1, convolutional_layer_2, pooling_layer_1, pooling_layer_2)
 	#Empieza el entrenamiento con fit.
 	print('Empezo el entrenamiento:')
-	model.fit(datos_imagenes_entrenamiento, datos_target_entrenamiento, batch_size=1000, epochs=epochs, verbose=1)
+	#model.fit(datos_imagenes_entrenamiento, datos_target_entrenamiento, batch_size=batch_size, epochs=epochs, verbose=1)
+	model.fit(train_dataset, epochs=epochs,steps_per_epoch=100, verbose=1)
 	print('Finalizo el entrenamiento')
 	return model
 
