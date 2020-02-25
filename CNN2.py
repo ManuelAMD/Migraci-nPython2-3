@@ -60,7 +60,7 @@ def fitModel(datos_imagenes_entrenamiento, datos_target_entrenamiento, tam_image
 	#N gpus
 	#strategy = tf.distribute.MirroredStrategy()
 	#2 gpus
-	strategy = tf.distribute.MirroredStrategy(devices=['/gpu:0','/gpu:1'])
+	strategy = tf.distribute.MirroredStrategy(devices=['/gpu:2','/gpu:3'])
 	#1 gpu
 	#strategy = tf.distribute.OneDeviceStrategy(device="/gpu:0")
 	batch = 1000
